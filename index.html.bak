@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src='https://d3js.org/d3.v5.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" href="./css/calendar.css">
+    <style>
+
+    </style>
+</head>
+
+<body>
+
+<div onload='init()'>
+    <svg class="chart" width="960" height="500"
+         viewBox="0 0 960 500"
+         preserveAspectRatio="xMidYMid meet"></svg>
+
+</div>
+
+<div id="calendar"></div>
+
+
+
+<script>
+    var date_parser = d3.utcParse("%Y-%m-%d %H:%M:%S")
+    const cellSize = 15
+    const yearHeight = cellSize * 7 + 25
+    const formatDay = d => ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"][d.getUTCDay()]
+    const countDay = d => d.getUTCDay()
+    const timeWeek = d3.utcSunday
+    const svg = d3.select("svg.chart")
+    var data = []
+    var months = {}
+    var years = {}
+
+    async function init() {
+
+        data = await d3.csv("data/timesheet.csv");
+        data.forEach(function (d) {
+            d.date = d3.utcParse("%Y-%m-%d")(d.date);
+            d.start_time = date_parser(d.start_time);
+            d.end_time = date_parser(d.end_time);
+            d.minutes = parseFloat(d.minutes);
+        });
+        console.log(data);
+        console.log("dsadasdasdsadas");
+        drawCalendar(data);
+        years = d3.nest()
+            .key(d => d.start_time.getUTCFullYear())
+            .entries(data)
+            .reverse()
+        console.log(years);
+
+        months = d3.nest()
+            .key(d => [d.start_time.getUTCFullYear(), d.start_time.getUTCMonth()])
+            .entries(data)
+            .reverse()
+        console.log(months);
+
+
+        var year = d3.select("svg.chart").append("g")
+            .data(years)
+            .attr('transform', (d, i) => `translate(40, ${yearHeight * i + cellSize * 1.5})`);
+
+        year.append('text')
+            .attr('x', -5)
+            .attr('y', -30)
+            .attr("text-anchor", "end")
+            .attr('font-size', 16)
+            .attr('font-weight', 550)
+            .attr('transform', 'rotate(270)')
+            .text(d => d.key);
+
+        year.append('g')
+            .attr('text-anchor', 'end')
+            .selectAll('text')
+            .data(d3.range(7).map(i => new Date(1999, 0, i)))
+            .join('text')
+            .attr('x', -5)
+            .attr('y', d => (countDay(d) + 0.5) * cellSize)
+            .attr('dy', '0.31em')
+            .text(formatDay);
+
+        year.append('g')
+            .selectAll('rect')
+            .data(d => d.values)
+            .join('rect')
+            .attr("width", cellSize - 1.5)
+            .attr("height", cellSize - 1.5)
+            .attr("x", (d, i) => timeWeek.count(d3.utcYear(d.date), d.date) * cellSize + 10)
+            .attr("y", d => countDay(d.date) * cellSize + 0.5)
+            .attr("fill", d => colorScale(d.minutes));
+
+        let div = d3.select("body").append("div")
+            .attr("class", "tooltip-donut")
+            .style("opacity", 0);
+
+        svg.selectAll('rect').on('mouseover', function (d, i) {
+            d3.select(this).transition()
+                .duration('50')
+                .attr('opacity', '.85');
+            //Makes the new div appear on hover:
+            div.transition()
+                .duration(50)
+                .style("opacity", 1);
+        })
+            .on('mouseout', function (d, i) {
+                d3.select(this).transition()
+                    .duration('50')
+                    .attr('opacity', '1');
+                //Makes the new div disappear:
+                div.transition()
+                    .duration('50')
+                    .style("opacity", 0);
+            });
+
+    }
+
+
+</script>
+<script src="./js/calendar_by_weeks.js"></script>
+<script src="./js/calendar_timeline.js"></script>
+<script>
+        var now = moment().endOf('day').toDate();
+        var time_ago = moment().startOf('day').subtract(10, 'year').toDate();
+        var example_data = d3.timeDays(time_ago, now).map(function (dateElement, index) {
+            return {
+                date: dateElement,
+                details: Array.apply(null, new Array(Math.floor(Math.random() * 15))).map(function(e, i, arr) {
+                    return {
+                        'name': 'Project ' + Math.ceil(Math.random() * 10),
+                        'date': function () {
+                            var projectDate = new Date(dateElement.getTime());
+                            projectDate.setHours(Math.floor(Math.random() * 24));
+                            projectDate.setMinutes(Math.floor(Math.random() * 60));
+                            return projectDate;
+                        }(),
+                        'value': 3600 * ((arr.length - i) / 5) + Math.floor(Math.random() * 3600) * Math.round(Math.random() * (index / 365))
+                    }
+                }),
+                init: function () {
+                    this.total = this.details.reduce(function (prev, e) {
+                        return prev + e.value;
+                    }, 0);
+                    return this;
+                }
+            }.init();
+        });
+        console.log("example data!")
+        console.log(example_data);
+        // Set the div target id
+        var div_id = 'calendar';
+
+        // Set custom color for the calendar heatmap
+        var color = '#cd2327';
+
+        // Set overview type (choices are year, month and day)
+        var overview = 'year';
+
+        // Handler function
+        var print = function (val) {
+            console.log(val);
+        };
+
+        // Initialize calendar heatmap
+        calendarHeatmap.init(example_data, div_id, color, overview, print);
+</script>
+</body>
+</html>
