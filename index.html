@@ -16,8 +16,8 @@
         data = await d3.json("data/time.json");
         data.forEach(function (d) {
             d.date = d3.utcParse("%Y-%m-%d")(d.date);
-            d.start_time = date_parser(d.start_time);
-            d.end_time = date_parser(d.end_time);
+            d.start_time = datetime_parser(d.start_time);
+            d.end_time = datetime_parser(d.end_time);
         });
         console.log(data);
         calendarHeatmap.init(data);
