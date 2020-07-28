@@ -96,6 +96,8 @@ function drawCalendar(dateData) {
     rect.filter(function(d) { return d in lookupminutes; })
         .style("fill", function(d) { return colorScale(lookupminutes[format(d)]); })
 
+    calendarHeatmap.drawDescription();
+
 
 }
 
