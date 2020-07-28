@@ -10,25 +10,30 @@ svg {
     -moz-user-select: none;
     -webkit-user-select: none;
 }
+
 .calendar-heatmap .item {
     cursor: pointer;
 }
+
 .calendar-heatmap .label {
     cursor: pointer;
     fill: rgb(170, 170, 170);
     font-family: Helvetica, arial, 'Open Sans', sans-serif;
 }
+
 .calendar-heatmap .button {
     cursor: pointer;
     fill: transparent;
     stroke-width: 2;
     stroke: rgb(170, 170, 170);
 }
+
 .calendar-heatmap .button text {
     stroke-width: 1;
     text-anchor: middle;
     fill: rgb(170, 170, 170);
 }
+
 .calendar-heatmap .heatmap-tooltip {
     pointer-events: none;
     position: absolute;
@@ -43,16 +48,19 @@ svg {
     font-family: Helvetica, arial, 'Open Sans', sans-serif;
     background: rgba(255, 255, 255, 0.75);
 }
+
 .calendar-heatmap .heatmap-tooltip .header strong {
     display: inline-block;
     width: 250px;
 }
+
 .calendar-heatmap .heatmap-tooltip span {
     display: inline-block;
     width: 50%;
     padding-right: 10px;
     box-sizing: border-box;
 }
+
 .calendar-heatmap .heatmap-tooltip span,
 .calendar-heatmap .heatmap-tooltip .header strong {
     white-space: nowrap;
@@ -60,7 +68,69 @@ svg {
     text-overflow: ellipsis;
 }
 
+h2.heatmap-description-odd {
+    -webkit-tap-highlight-color: transparent;
+    --breakpoint-xs: 0;
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+    --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    text-align: center;
+    box-sizing: border-box;
+    outline: none !important;
+    font-family: inherit;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #95A5A6;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 29px;
+}
 
+h2.heatmap-description-even {
+    -webkit-tap-highlight-color: transparent;
+    --breakpoint-xs: 0;
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+    --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    text-align: center;
+    box-sizing: border-box;
+    outline: none !important;
+    font-family: inherit;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #7F8C8D;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-size: 29px;
+}
+
+span.emphasize {
+    -webkit-tap-highlight-color: transparent;
+    --breakpoint-xs: 0;
+    --breakpoint-sm: 576px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 992px;
+    --breakpoint-xl: 1200px;
+    --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    text-align: left;
+    font: 700 24.5px/40px "Helvetica Neue", Helvetica, Arial, sans-serif;
+    box-sizing: border-box;
+    outline: none !important;
+    font-weight: 700;
+    color: #6a89cc;
+    margin-bottom: 15px;
+    margin-top: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    line-height: 40px !important;
+    font-size: 24.5px !important;
+}
 
 #calendar {
     margin: 20px;
@@ -89,4 +159,23 @@ svg {
 .chart {
     background: #fff;
     margin: 5px;
+}
+
+
+
+html {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #ecf0f1 0%, #bdc3c7 1008%) no-repeat;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+body {
+    text-align: center;
+    display: table;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: hidden;
 }

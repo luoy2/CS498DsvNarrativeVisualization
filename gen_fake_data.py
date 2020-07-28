@@ -13,7 +13,7 @@ class DateTimeEncoder(JSONEncoder):
                 return obj.isoformat()
 
 
-dates = pd.date_range("2020-01-01", "2020-08-01")
+dates = pd.date_range("2020-01-01", "2020-10-01")
 worktype = ["meeting", "bug fix", "new features", "deployment"]
 fake = faker.Faker()  # English
 

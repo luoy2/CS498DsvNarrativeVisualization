@@ -10,6 +10,9 @@
 <div id="calendar"></div>
 <script src="./js/calendar.js"></script>
 <script src="./js/parsers.js"></script>
+<div class="mouse">
+    <span></span>
+</div>
 <script>
 
     async function init() {
@@ -19,7 +22,7 @@
             d.start_time = datetime_parser(d.start_time);
             d.end_time = datetime_parser(d.end_time);
         });
-        console.log(data);
+        // console.log(data);
         calendarHeatmap.init(data);
     }
 
