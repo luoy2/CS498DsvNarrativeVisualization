@@ -593,7 +593,7 @@ var calendarHeatmap = {
                 .end().then(
                 () => calendarHeatmap.annotations.append('text')
                     .attr("x", (points[2][0] + points[1][0]) / 2)
-                    .attr("y", points[2][1] + 10)
+                    .attr("y", points[2][1] + 12)
                     .attr("class", "annotate-title")
                     .transition()
                     .duration(calendarHeatmap.settings.transition_duration / 2)
@@ -646,7 +646,9 @@ var calendarHeatmap = {
                 calendarHeatmap.items.selectAll('.item-block').data().forEach(function (d) {
                     console.log(d.start_time);
                     let x = calendarHeatmap.scales.timeScale(d.start_time.getHours() * 3600 + d.start_time.getMinutes() * 60 + d.minutes * 30);
-                    let y = calendarHeatmap.scales.dayScale(moment(d.start_time).format('dddd')) + calendarHeatmap.settings.label_padding;
+                    let y = calendarHeatmap.scales.dayScale(moment(d.date).format('dddd'))
+                        + calendarHeatmap.scales.dayScale.bandwidth()
+                        + 5;
                     calendarHeatmap.annotations.append('text')
                         .attr("x", x)
                         .attr("y", y + calendarHeatmap.settings.item_size / 2)
@@ -745,8 +747,8 @@ var calendarHeatmap = {
             calendarHeatmap.texts = [
                 "In this week you have done <span class='emphasize'>" + (this_hour).toFixed(2) + "</span> hours of work ... Good Job!<br>",
                 "You have made <span class='emphasize'>$" + data.weekly_salary.toFixed(2) + "</span> !<br>",
-                "The average weekly working hour in the past years were <span class='emphasize'>" + (hist_hour).toFixed(2) + "</span> hours...<br>",
-                inspiration_text
+                "As for working type, you have done the above tasks shown in graph....",
+                "The average weekly working hour in the past years were <span class='emphasize'>" + (hist_hour).toFixed(2) + "</span> hours...<br>Hover on the chart to explore more!",
             ]
             if (calendarHeatmap.state.descriptions_state < calendarHeatmap.texts.length) {
                 if (calendarHeatmap.view_type === 'week') {

@@ -332,9 +332,9 @@ header:after {
 
 .annotate-title {
     font-family: 'Lato';
-    fill: darkgrey;
+    fill: black;
     font-size: 90%;
-    font-weight: 200;
+    font-weight: 400;
     opacity: 1;
     text-align: center;
     text-anchor: middle;
