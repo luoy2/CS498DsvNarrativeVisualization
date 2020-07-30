@@ -338,6 +338,8 @@ header:after {
     opacity: 1;
     text-align: center;
     text-anchor: middle;
+    vertical-align: middle;
+    horiz-align: center;
     z-index: 30;
 }
 
@@ -353,8 +355,9 @@ header:after {
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
-    color: #212529;
-    text-align: right;
+    fill: white;
+    text-align: center;
+    text-anchor: middle;
     font-family: 'Roboto Slab', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     box-sizing: border-box;
 }

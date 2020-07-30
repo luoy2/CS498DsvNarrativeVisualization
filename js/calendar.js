@@ -84,6 +84,8 @@ var calendarHeatmap = {
             let container = document.createElement('div');
             container.className = 'calendar-heatmap';
             document.body.appendChild(container);
+            calendarHeatmap.legend = d3.select(container).append('div')
+                .attr('class', 'legend')
             calendarHeatmap.yearContainer = d3.select(container).append('div')
                 .attr('id', 'heatmap-year-container');
             // Create svg element
@@ -99,6 +101,7 @@ var calendarHeatmap = {
             calendarHeatmap.tooltip = d3.select(container).append('div')
                 .attr('class', 'heatmap-tooltip')
                 .style('opacity', 0);
+
 
             // Add description section
             calendarHeatmap.descriptions = d3.select(container).append('div')
@@ -118,7 +121,7 @@ var calendarHeatmap = {
                 calendarHeatmap.settings.item_size = ((calendarHeatmap.settings.width - calendarHeatmap.settings.label_padding) / numWeeks - calendarHeatmap.settings.gutter);
                 calendarHeatmap.settings.height = calendarHeatmap.settings.label_padding + 7 * (calendarHeatmap.settings.item_size + calendarHeatmap.settings.gutter) + 50;
                 if (calendarHeatmap.view_type === 'week') {
-                    calendarHeatmap.svg.attr('width', calendarHeatmap.settings.width).attr('height', calendarHeatmap.settings.height)
+                    calendarHeatmap.svg.attr('width', calendarHeatmap.settings.width).attr('height', calendarHeatmap.settings.height + 30)
                 } else {
                     calendarHeatmap.svg.attr('width', 0).attr('height', 0)
                 }
@@ -589,8 +592,8 @@ var calendarHeatmap = {
                 .attr("stroke-dashoffset", 0)
                 .end().then(
                 () => calendarHeatmap.annotations.append('text')
-                    .attr("x", (points[2][0] + points[1][0])/ 2)
-                    .attr("y", points[2][1] + calendarHeatmap.settings.item_size/1.5)
+                    .attr("x", (points[2][0] + points[1][0]) / 2)
+                    .attr("y", points[2][1] + 10)
                     .attr("class", "annotate-title")
                     .transition()
                     .duration(calendarHeatmap.settings.transition_duration / 2)
@@ -611,14 +614,21 @@ var calendarHeatmap = {
         }
         ,
 
-        removeAnnotation: function(){
+        removeAnnotation: function () {
             calendarHeatmap.annotations.selectAll('path').remove();
             calendarHeatmap.annotations.selectAll('text').remove();
+            calendarHeatmap.annotations.selectAll('rect').remove();
+            calendarHeatmap.legend.selectAll('p').remove();
+            calendarHeatmap.items.selectAll('rect:not(.item)').remove();
 
         },
 
 
         drawWeekAnnotation: function () {
+            calendarHeatmap.hideScrollHint();
+            if (calendarHeatmap.in_transition) {
+                return;
+            }
             console.log(calendarHeatmap.state.descriptions_state);
             // calendarHeatmap.annotations.remove();
             if (calendarHeatmap.state.descriptions_state === 0) {
@@ -626,32 +636,87 @@ var calendarHeatmap = {
                     console.log(d.start_time);
                     calendarHeatmap.drawAnnotation(
                         calendarHeatmap.scales.timeScale(calendarHeatmap.getDailyPassedSeconds(d.start_time)),
-                        calendarHeatmap.scales.dayScale(moment(d.start_time).format('dddd')) + calendarHeatmap.settings.label_padding,
+                        calendarHeatmap.scales.dayScale(moment(d.start_time).format('dddd')) + calendarHeatmap.scales.dayScale.bandwidth(),
                         (d.minutes ? calendarHeatmap.formatTime(d.minutes * 60) : 'No time'),
                         ""
                     )
                 })
-            }
-            else if (calendarHeatmap.state.descriptions_state === 1) {
+            } else if (calendarHeatmap.state.descriptions_state === 1) {
                 calendarHeatmap.removeAnnotation();
                 calendarHeatmap.items.selectAll('.item-block').data().forEach(function (d) {
                     console.log(d.start_time);
-                    let x = calendarHeatmap.scales.timeScale(d.start_time.getHours()*3600 + d.start_time.getMinutes()*60 + d.minutes*30);
+                    let x = calendarHeatmap.scales.timeScale(d.start_time.getHours() * 3600 + d.start_time.getMinutes() * 60 + d.minutes * 30);
                     let y = calendarHeatmap.scales.dayScale(moment(d.start_time).format('dddd')) + calendarHeatmap.settings.label_padding;
                     calendarHeatmap.annotations.append('text')
                         .attr("x", x)
-                        .attr("y", y + calendarHeatmap.settings.item_size/2)
+                        .attr("y", y + calendarHeatmap.settings.item_size / 2)
                         .attr("class", "annotate-title")
                         .style("fill", "orange")
                         .transition()
                         .duration(calendarHeatmap.settings.transition_duration / 2)
                         .ease(d3.easeCubic)
-                        .text('$' + (d.minutes/60*50).toFixed(2));
+                        .text('$' + (d.minutes / 60 * 50).toFixed(2));
                 })
-            }
-            else{
+            } else if (calendarHeatmap.state.descriptions_state === 2) {
+                calendarHeatmap.removeAnnotation();
+                let week_data = calendarHeatmap.selected.week_data
+                let tag_sets = d3.map(d3.merge(week_data.map(d => d.tags_have_done)), d => d).keys()
+                let tag_color_scale = d3.scaleOrdinal(d3.schemePaired).domain(tag_sets)
+                let tag_html = `<p style="font-family:sans-serif;color:white;font-weight:bold;line-height:1.8em;">`
+                tag_sets.forEach(function (word) {
+                    tag_html += '<span style="background:' + tag_color_scale(word)+ '; padding:5px; ">' + word + '</span>'
+
+                })
+                tag_html += '</p>'
+                calendarHeatmap.legend.html(tag_html)
+                // now fill the bar with colors
+                week_data.forEach(function (d, i) {
+                    let this_tags = week_data[i].tags_have_done
+                    let fill_cut = week_data[i].minutes/this_tags.length
+                    calendarHeatmap.items.selectAll('.rect-fill' + i).data(this_tags)
+                        .enter()
+                        .append('rect')
+                        .attr('class', '.rect-fill' + i)
+                        .attr('x', function (d, index) {
+                            return calendarHeatmap.scales.timeScale(
+                                week_data[i].start_time.getHours() * 60 * 60
+                                + week_data[i].start_time.getMinutes() * 60
+                                + week_data[i].start_time.getSeconds()
+                                + fill_cut*index*60
+                            )
+                        })
+                        .attr('y', function (d) {
+                            return calendarHeatmap.scales.dayScale(
+                                moment(week_data[i].date).format('dddd')) + calendarHeatmap.scales.dayScale.bandwidth();
+                        })
+                        .attr('width', function (d, index) {
+                            let start = calendarHeatmap.scales.timeScale(
+                                week_data[i].start_time.getHours() * 60 * 60
+                                + week_data[i].start_time.getMinutes() * 60
+                                + week_data[i].start_time.getSeconds()
+                                + fill_cut*index*60);
+                            let end = calendarHeatmap.scales.timeScale(
+                                week_data[i].start_time.getHours() * 60 * 60
+                                + week_data[i].start_time.getMinutes() * 60
+                                + week_data[i].start_time.getSeconds()
+                                + fill_cut*(index+1)*60);
+                            return Math.max((end - start), 1);
+                        })
+                        .attr('height', function () {
+                            return Math.min(calendarHeatmap.scales.dayScale.bandwidth(), calendarHeatmap.settings.max_block_height);
+                        })
+                        .attr('fill', d => tag_color_scale(d))
+                        .transition()
+                        .duration(calendarHeatmap.settings.transition_duration / 2)
+                        .ease(d3.easeCubic)
+
+                })
+
+
+            } else {
                 calendarHeatmap.removeAnnotation();
             }
+            calendarHeatmap.drawScrollHint();
         },
 
         /**
@@ -798,20 +863,7 @@ var calendarHeatmap = {
          * @param seconds Integer
          */
         formatTime: function (seconds) {
-            let sec_num = parseInt(seconds, 10);
-            let hours = Math.floor(sec_num / 3600);
-            let minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-            let time = '';
-            if (hours > 0) {
-                time += hours === 1 ? '1 hour ' : hours + ' hours ';
-            }
-            if (minutes > 0) {
-                time += minutes === 1 ? '1 minute' : minutes + ' minutes';
-            }
-            if (hours === 0 && minutes === 0) {
-                time = seconds + ' seconds';
-            }
-            return time;
+            return (seconds/60/60).toFixed(2) + ' hours';
         }
         ,
 
