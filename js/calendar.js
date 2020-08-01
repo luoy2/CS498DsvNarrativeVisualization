@@ -714,11 +714,10 @@ var calendarHeatmap = {
 
                 })
 
-
             } else {
                 calendarHeatmap.removeAnnotation();
             }
-            calendarHeatmap.drawScrollHint();
+            setTimeout(() => calendarHeatmap.drawScrollHint(), 1000);
         },
 
         /**
